@@ -4,7 +4,7 @@ a gitter-like chat room
 
 > my personal website: [Sidfate](http://sidfate.com)
 
-### Feature:  
+### Feature
 - Support Makrdown
 
 - Login by github 
