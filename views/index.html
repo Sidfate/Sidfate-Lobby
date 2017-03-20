@@ -1,0 +1,335 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>聊天室</title>
+	<link href="http://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" >
+	<link href="http://cdn.bootcss.com/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/styles/dark.min.css">
+	<link rel="stylesheet" href="/css/style.css"></link>
+	<link rel="stylesheet" href="/css/index.css"></link>
+</head>
+<body>
+
+	<div class="chat-header-wrapper">
+		<header class="chat-header">
+			<div class="chat-header-inner">
+				<div class="chat-header__main-grouping chat-header__avatar-grouping">
+					<div class="chat-header__avatar">
+						<a href="/"><img src="/imgs/logo.png" class="" height="48" width="48"></a>
+					</div>
+				</div>
+				<div class="chat-header__main-grouping chat-header__info-grouping">
+					<div class="chat-header__heading-sub-group">
+						<h1 class="js-chat-name chat-header__heading">
+							<a class="chat-header__title">Sidfate/Lobby</a>
+						</h1> 
+					</div>
+					<div class="chat-header__top-sub-group">
+						<div class="chat-header__topic-wrapper">
+							<p class="chat-header__topic">chat for live</p>
+						</div>
+					</div>
+				</div>
+				<div class="chat-header__main-grouping chat-header__action-grouping" v-if="isLogin">
+					<a href="/" class="chat-header__org-page org-page-link" title="More Rooms" data-toggle="tooltip" data-placement="left">
+						<i class="chat-header__action-icon fa fa-globe"></i>
+					</a>
+					<button class="chat-header__favourite" data-toggle="tooltip" data-placement="left" title="Favourite Sidfate/Lobby">
+						<i class="chat-header__action-icon fa fa-star-o"></i>
+					</button>
+					<button class="chat-header__settings" data-toggle="tooltip" data-placement="left" title="Room Setting" @click="showDropdown" id="chat-settings">
+						<i class="chat-header__action-icon fa fa-sliders"></i>
+					</button>
+					<ul class="dropdown-menu chat-header__settings-list" aria-labelledby="chat-settings" style="right: 70px">
+				    	<li>
+				    		<a @click="showModal('add-people')">Add people to this room</a>
+				    	</li>
+				    	<li>
+				    		<a @click="showModal('share')">Share this chat room</a>
+				    	</li>
+				    	<li class="divider"></li>
+				    	<li>
+				    		<a>Leave this room</a>
+				    	</li>
+					</ul>
+					<div class="profile-menu">
+						<img :src="user.avatar" class="profile-menu__avatar" v-if="user.avatar" id="profile-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+						<ul class="dropdown-menu profile-menu__list" aria-labelledby="profile-menu" >
+					    	<li>
+					    		<a href="/">Home</a>
+					    	</li>
+					    	<li>
+					    		<a @click="logout">Sign out</a>
+					    	</li>
+						</ul>
+					</div>
+					
+				</div>
+			</div>
+		</header>
+		<div class="chat-and-toolbar-wrapper">
+			<div class="right-toolbar-region" id="right-toolbar-layout">
+				<div class="right-toolbar right-toolbar--collapsible">
+					<div class="right-toolbar__body" id="toolbar-top-content">
+						<div id="people-list">
+							<div class="trpToolbarHeader" id="top-header">
+								<h5 class="trpToolbarHeaderItem">
+									People
+								</h5>
+							</div>
+							<div class="trpToolbarList">
+								<div class="trpToolbarListContent" id="people-roster">
+									<div>
+										<span class="frame-people">
+											<span>
+												<ul class="roster" id="roster-view">
+													
+												</ul>
+											</span>
+											<div class="remaining-region" id="remaining-region">
+												<div class="remaining">
+													<div class="remaining-view">
+														<a class="remaining-view-button button-caribbean--xsmall" @click="showModal('add-people')">Add</a>
+														<a class="remaining-view-secondary-button secondary-button-caribbean--xsmall">SEE ALL 
+															<span class="remaining-view-button-secondary-text">(<span id="people-number">0</span> people)</span>
+														</a>
+													</div>
+												</div>
+											</div>
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div id="activity-region" class="right-toolbar-activity-area">
+							<div class="right-toolbar-activity-area-inner">
+								<div class="trpToolbarHeader">
+									<h5 class="trpToolbarHeaderItem" id="activity-header">
+										Activity
+									</h5>
+								</div>
+								<ul class="right-toolbar-activity-list u-font-smaller" id="user-activity">
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="right-toolbar-region__footer" id="right-toolbar-footer-region">
+						<svg class="menu-toggle-icon js-menu-toggle-icon" width="30px" height="34px" viewBox="0 0 30 34" @click="rightToolbarRetract">
+						  	<path d="M0,6 l15,0 l15,0"></path>
+						  	<path d="M0,17 l15,0 l15,0"></path>
+						  	<path d="M0,28 l15,0 l15,0"></path>
+						</svg>
+					</div>
+				</div>
+			</div>
+			<div class="chat-app">
+				<div class="trpContentPanel">
+					<div>
+						<div class="trpChatPanel">
+							<div class="trpChatContainer primary-scoll chat-container scroller">
+								<div id="chat-container">
+									<div>
+									
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<footer class="chat-input" v-if="isLogin">
+					<div class="progress">
+						<div class="progress__bar"></div>
+					</div>
+					<div class="chat-input__container js-chat-input-container">
+						<div class="chat-input__area">
+							<div class="chat-input__avatar">
+								<div class="trpDisplayPicture avatar-s">
+									<img :src="user.avatar" height="30" width="30" class="avatar__image" v-if="user.avatar"/>
+								</div>
+							</div>
+							<div class="chat-input-box__region">
+								<form class="chat-input__box" name="chat">
+									<div class="textcomplete-wrapper">
+										<textarea class="chat-input__text-area" placeholder="Click here to type a chat message.(Supports markdown)" id="chat-input-textarea"></textarea>
+									</div>
+								</form>
+							</div>
+							<div class="chat-input__buttons">
+								<div>
+									<button class="chat-input__button">
+										<i class="chat-input__button-icon fa fa-comments-o"></i>
+									</button>
+									<a class="chat-input__button" @click="showModal('markdown-help')">
+										<i class="chat-input__button-icon fa fa-question-circle-o"></i>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</footer>
+				<footer class="chat-input chat-input-nli" v-else>
+					<a class="chat-input__btn" @click="showModal('login')"> Sign in to start chatting </a>
+				</footer>
+			</div>
+		</div>
+		<!-- add people modal -->
+		<div class="modal fade" tabindex="-1" role="dialog" id="add-people-modal">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Add People</h4>
+					</div>
+					<div class="modal-body">
+						<input type="text" class="form-control" placeholder="Search for people">
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-info" @click="showModal('share')">Share this room</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+		<!-- share chat room-->
+		<div class="modal fade" tabindex="-1" role="dialog" id="share-modal">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Share this chat room</h4>
+					</div>
+					<div class="modal-body">
+						<div class="share-view">
+							<section class="share-view__section">
+							  <input class="share-view__copy-field" v-model="share.url"  readonly="readonly" onclick="this.select();">
+							  <button class="button-jaffa--small js-copy" @click="copyShareUrl">Copy</button>
+							</section>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-info" @click="showModal('add-people')">Add People</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+		<div class="modal fade" tabindex="-1" role="dialog" id="login-modal">
+			<div class="modal-dialog modal-sm" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Login</h4>
+					</div>
+					<div class="modal-body">
+			        	<div class="login-view">
+			        		<section class="login-view__section">
+						  	<div class="login-view__buttons">
+						    	<a href="/user/oauth/github" class="login-view__button button-github--small">
+						      		<i class="fa fa-github"></i> Sign in with GitHub
+						    	</a>
+						  	</div>
+
+						  	<div class="modal--default__content__fineprint login-view__agree">
+						    	<p>By logging in you agree to our <a class="login-view__agree-link" target="_blank">Terms and Conditions</a>.</p>
+						  	</div>
+							</section>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<!-- <button type="button" class="btn btn-info login-button" @click="login">Sign in</button> -->
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+		<div class="modal fade" tabindex="-1" role="dialog" id="markdown-help-modal">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Markdown Help</h4>
+					</div>
+					<div class="modal-body">
+						<table class="markdown-help-content table table-striped">
+							<tbody>
+							    <tr>
+							      <td><strong>Bold</strong></td>
+							      <td>**bold**</td>
+							    </tr>
+							    <tr>
+							      <td><i>Italics</i></td>
+							      <td>*italics*</td>
+							    </tr>
+							    <tr>
+							      <td><del>Strikethrough</del></td>
+							      <td>~~strikethrough~~</td>
+							    </tr>
+							    <tr>
+							      <td>Header</td>
+							      <td># H1     ## H2     ### H3</td>
+							    </tr>
+							    <tr>
+							      <td><li>item</li></td>
+							      <td>* item</td>
+							    </tr>
+							    <tr>
+							      <td>Blockquote</td>
+							      <td>&gt; blockquote</td>
+							    </tr>
+							    <tr>
+							      <td><span class="trpChatText"><span class="mention">@somebody</span> (mention)</span></td>
+							      <td>@somebody</td>
+							    </tr>
+							    <tr>
+							      <td><span class="issue open">#123</span> (issue)</td>
+							      <td>#123</td>
+							    </tr>
+							    <tr>
+							      <td><a href="http://www.youtube.com/watch?v=BROWqjuTM0g" target="_rick">Link</a></td>
+							      <td>[title](http://)</td>
+							    </tr>
+							    <tr>
+							      <td>Image</td>
+							      <td>![alt](http://)</td>
+							    </tr>
+							    <tr>
+							      <td><code>code</code></td>
+							      <td>`code`</td>
+							    </tr>
+							    <tr>
+							      <td>L<sup>a</sup>T<sub>e</sub>X</td>
+							      <td>$$LaTeX code$$</td>
+							    </tr>
+							    <tr>
+							      <td><pre style="display: inline-block; margin: 4px 0"><code><span class="keyword">var </span>code = <span class="string">"formatted"</span>;</code></pre></td>
+							      <td style="line-height: 100%">``` <i style="color: rgba(0,0,0,0.5)">(shift+enter for line break)</i><br>var code = "formatted";<br>```</td>
+							    </tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+	</div>
+
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+	<script src="http://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+	<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" ></script>
+	<script src="http://cdn.bootcss.com/toastr.js/latest/js/toastr.min.js"></script>
+	<script src="http://cdn.bootcss.com/markdown.js/0.5.0/markdown.min.js"></script>
+	<script src="http://cdn.bootcss.com/vue/2.2.1/vue.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/vue.resource/1.2.1/vue-resource.min.js"></script>
+	<script src="http://cdn.bootcss.com/highlight.js/9.10.0/highlight.min.js"></script>
+	<script src="http://cdn.bootcss.com/zeroclipboard/2.3.0/ZeroClipboard.min.js"></script>
+	<script type="text/javascript" src="/js/chat.js"></script>
+</body>
+</html>
+
+
+
+
