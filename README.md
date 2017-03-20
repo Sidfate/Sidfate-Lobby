@@ -1,4 +1,4 @@
-#Sidfate-Lobby [online](http://sidfate/chat)
+# Sidfate-Lobby [online](http://sidfate/chat)
 -------------
 a gitter-like chat room
 
