@@ -1,5 +1,5 @@
 # Sidfate-Lobby [online](http://sidfate/chat)
--------------
+
 a gitter-like chat room
 
 > my personal website: [Sidfate](http://sidfate.com)
