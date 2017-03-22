@@ -20,6 +20,6 @@ node bin/www
 ### TODO
 * Add people from github
 
-* Markdown supports <table>
+* Markdown supports "table"
 
 * Save logined users' log
